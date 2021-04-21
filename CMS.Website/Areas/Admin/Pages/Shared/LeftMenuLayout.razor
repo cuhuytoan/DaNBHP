@@ -1,0 +1,71 @@
+﻿<!-- ===== Left-Sidebar ===== -->
+
+<div class="scroll-sidebar">
+    <div class="user-profile">
+        <div class="dropdown user-pro-body">
+            <div class="profile-image">
+
+                <a href="javascript:void(0);" class="dropdown-toggle u-dropdown text-blue" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <img src="/data/user/mainimages/small/@avatar" alt="user-img" class="img-circle">                   
+                </a>
+                <ul class="dropdown-menu animated flipInY">
+                    <li><a href="/Admin/Account/EditProfile"><i class="fa fa-user"></i> Thông tin cá nhân</a></li>
+                    <li><a href="/Admin/Account/ChangePassword"><i class="fa fa-key"></i> Đổi mật khẩu</a></li>                    
+                    <li role="separator" class="divider"></li>
+                    <li><a href="/Identity/Account/Logout"><i class="fa fa-power-off"></i> Logout</a></li>
+                </ul>
+            </div>
+            <p class="profile-text m-t-15 font-16"><a href="/Admin/Account/EditProfile"> @user.Identity.Name</a></p>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <ul id="side-menu">
+            <li>
+                <a class="waves-effect" href="javascript:void(0);" aria-expanded="false"><i class="icon-screen-desktop fa-fw"></i> <span class="hide-menu"> Quản lý bài viết </span></a>
+                <ul aria-expanded="false" class="collapse">
+                    <li> <a href="/Admin/Article">Danh sách bài viết</a> </li>
+                    <li> <a href="/Admin/Article/Edit">Thêm mới bài viết</a> </li>                    
+                </ul>
+            </li>
+            <li>
+                <a class="waves-effect" href="javascript:void(0);" aria-expanded="false"><i class="icon-user fa-fw"></i> <span class="hide-menu"> Quản lý thành viên </span></a>
+                <ul aria-expanded="false" class="collapse">
+                    <li> <a href="/Admin/Account/Index">Danh sách thành viên</a> </li>
+                    <li> <a href="/Admin/Account/Edit">Thêm mới thành viên</a> </li>                    
+                </ul>
+            </li>
+            <li>
+                <a class="waves-effect" href="javascript:void(0);" aria-expanded="false"><i class="icon-settings fa-fw"></i> <span class="hide-menu"> Cấu hình hệ thống </span></a>
+                <ul aria-expanded="false" class="collapse">
+                    <li> <a href="/Admin/Settings/Edit">Cấu hình hệ thống</a> </li>           
+                </ul>
+            </li>         
+        </ul>
+    </nav>    
+</div>
+@code{
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    ClaimsPrincipal user;
+    string userId { get; set; }
+    public string avatar { get; set; } = "noimages.png";
+    protected override async Task OnInitializedAsync()
+    {
+        //get claim principal
+        var authState = await authenticationStateTask;
+        user = authState.User;
+        userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        await InitData();
+
+    }
+    private async Task InitData()
+    {
+        var profiles = await Repository.AspNetUsers.AspNetUserProfilesGetByUserId(userId);
+        if (profiles != null)
+        {
+            avatar = profiles.AvatarUrl;
+        }     
+    }
+}
+<!-- ===== Left-Sidebar-End ===== -->
